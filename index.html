@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Forja de Skins</title>
+<meta name="description" content="Editor de skins para Minecraft Java com prévia 3D e um acervo de skins medievais gratuitas.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;700&family=Jacquarda+Bastarda+9&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+<!-- conteudo:inicio -->
+<header class="top">
+  <div class="top-in">
+    <a class="brand" href="#editor">
+      <svg class="anvil" viewBox="0 -2 16 10" aria-hidden="true">
+        <path class="anvil-iron" d="M0 1h15v1H0zM1 2h13v1H1zM4 3h8v1H4zM5 4h6v2H5zM4 6h8v1H4zM3 7h10v1H3z"/>
+        <path class="anvil-spark" d="M10-2h1v1h-1zM13-1h1v1h-1zM15-2h1v1h-1z"/>
+      </svg>
+      <span class="brand-name">Forja de Skins</span>
+    </a>
+    <p class="top-lead">Editor de skins para Minecraft Java Edition. Pinte no boneco 3D ou na textura e baixe o PNG pronto para o launcher.</p>
+    <nav class="nav" aria-label="Seções">
+      <a href="#editor">Editor</a>
+      <a href="#acervo">Acervo <span class="count" id="navCount"></span></a>
+      <a href="#como-usar">Como usar</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section id="editor" class="band editor" aria-label="Editor de skin">
+    <div class="bar">
+      <label class="name-field">
+        <span class="lbl">Nome</span>
+        <input id="skinName" maxlength="40" autocomplete="off" spellcheck="false">
+      </label>
+      <div class="seg" role="group" aria-label="Modelo dos braços">
+        <button type="button" id="mClassic" aria-pressed="true">Clássico <small>4 px</small></button>
+        <button type="button" id="mSlim" aria-pressed="false">Slim <small>3 px</small></button>
+      </div>
+      <div class="bar-group">
+        <button type="button" class="ib" id="undoBtn" title="Desfazer (Ctrl+Z)" aria-label="Desfazer" disabled></button>
+        <button type="button" class="ib" id="redoBtn" title="Refazer (Ctrl+Shift+Z)" aria-label="Refazer" disabled></button>
+      </div>
+      <div class="bar-group bar-actions">
+        <div class="menu-wrap">
+          <button type="button" class="btn" id="newBtn" aria-haspopup="menu" aria-expanded="false">Nova</button>
+          <div class="menu" id="newMenu" role="menu" hidden>
+            <button type="button" role="menuitem" data-new="manequim">Manequim de linho<span>rosto, túnica e calça para começar</span></button>
+            <button type="button" role="menuitem" data-new="vazio">Em branco<span>textura toda transparente</span></button>
+          </div>
+        </div>
+        <label class="btn" for="fileIn" id="importLbl">Importar PNG</label>
+        <input type="file" id="fileIn" class="vh" accept="image/png">
+        <button type="button" class="btn" id="saveBtn">Salvar</button>
+        <button type="button" class="btn primary" id="dlBtn">Baixar PNG</button>
+      </div>
+    </div>
+
+    <div class="work">
+      <div class="rail" id="rail" role="toolbar" aria-label="Ferramentas"></div>
+
+      <div class="stage" id="stage">
+        <canvas id="view" aria-label="Prévia 3D da skin"></canvas>
+        <div class="stage-top">
+          <div class="seg small" role="group" aria-label="Vista">
+            <button type="button" data-view="0">Frente</button>
+            <button type="button" data-view="180">Costas</button>
+            <button type="button" data-view="-90">Direita</button>
+            <button type="button" data-view="90">Esquerda</button>
+          </div>
+          <label class="sel">
+            <span class="vh">Animação</span>
+            <select id="anim">
+              <option value="parado">Parado</option>
+              <option value="respirando">Respirando</option>
+              <option value="andando">Andando</option>
+              <option value="correndo">Correndo</option>
+              <option value="acenando">Acenando</option>
+            </select>
+          </label>
+        </div>
+        <div class="stage-bottom">
+          <button type="button" class="chip" id="ovToggle" aria-pressed="true">Camada externa</button>
+          <div class="seg small" role="group" aria-label="Camada que recebe a tinta no 3D">
+            <span class="seg-lbl">Pintar na</span>
+            <button type="button" id="layerB" aria-pressed="true">base</button>
+            <button type="button" id="layerO" aria-pressed="false">externa</button>
+          </div>
+        </div>
+        <p class="stage-hint" id="stageHint"></p>
+        <div class="stage-fallback" id="stageFallback" hidden>
+          <p>A prévia 3D não carregou neste navegador. Você ainda pode pintar na textura ao lado e baixar o PNG.</p>
+        </div>
+      </div>
+
+      <aside class="side">
+        <div class="panel colors">
+          <div class="cur">
+            <span class="slot big"><input type="color" id="colorIn" aria-label="Escolher cor"></span>
+            <label class="hex">
+              <span class="lbl">Cor</span>
+              <input id="hexIn" class="mono" maxlength="7" spellcheck="false" autocomplete="off">
+            </label>
+            <div class="hotbar-wrap">
+              <span class="lbl">Recentes <kbd>1</kbd>–<kbd>9</kbd></span>
+              <div class="hotbar" id="hotbar"></div>
+            </div>
+          </div>
+          <div id="palettes" class="palettes"></div>
+        </div>
+        <div class="panel uvp">
+          <div class="uv-head">
+            <span class="lbl">Textura 64 × 64</span>
+            <label class="tog"><input type="checkbox" id="gridTog" checked> Grade</label>
+          </div>
+          <div class="uv-box"><canvas id="uv" aria-label="Textura da skin em 2D"></canvas></div>
+          <p class="status mono" id="status">Passe o cursor sobre a textura para ver cada parte.</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="acervo" class="band sec">
+    <div class="sec-head">
+      <h2>Acervo</h2>
+      <p class="lead" id="acervoLead">Skins originais desenhadas pixel a pixel para a Forja. São de domínio público (CC0): use, edite e compartilhe como quiser.</p>
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="Filtrar acervo"></div>
+    <div class="grid" id="grid"></div>
+    <p class="empty" id="emptyMine" hidden>Você ainda não salvou nenhuma skin. No editor, clique em <b>Salvar</b> e ela aparece aqui, guardada neste navegador.</p>
+  </section>
+
+  <section id="como-usar" class="band sec how">
+    <div class="sec-head">
+      <h2>Como usar no Minecraft Java</h2>
+    </div>
+    <div class="how-grid">
+      <ol class="steps">
+        <li><b>Baixe o PNG.</b> Termine a skin e clique em <i>Baixar PNG</i>. O arquivo sai com 64 × 64 pixels, no formato que o jogo espera.</li>
+        <li><b>Abra o Minecraft Launcher.</b> Escolha <i>Minecraft: Java Edition</i> e entre na aba <i>Skins</i>.</li>
+        <li><b>Crie uma nova skin.</b> Clique em <i>Nova skin</i>, selecione o arquivo e marque o modelo certo: <i>Clássico</i> para braços de 4 pixels ou <i>Slim</i> para braços de 3.</li>
+        <li><b>Salve e use.</b> A skin vale no próximo mundo que você abrir. Em servidores, ela aparece para os outros depois que você entra de novo.</li>
+      </ol>
+      <div class="facts panel">
+        <h3>Anatomia de uma skin</h3>
+        <dl>
+          <dt>Tamanho</dt>
+          <dd>PNG de 64 × 64. Arquivos antigos de 64 × 32 são convertidos ao importar, com braço e perna esquerdos espelhados.</dd>
+          <dt>Duas camadas</dt>
+          <dd>A base veste o corpo. A externa flutua meio pixel acima e serve para elmos, capuzes, mangas e armaduras. Só a externa aceita transparência; na base, pixel transparente fica preto no jogo.</dd>
+          <dt>Simetria</dt>
+          <dd>Com <i>Simetria</i> ligada, o que você pinta num braço ou perna se repete no outro, e o lado direito do rosto espelha o esquerdo.</dd>
+        </dl>
+        <h3>Atalhos</h3>
+        <ul class="keys">
+          <li><kbd>B</kbd> Lápis</li><li><kbd>E</kbd> Borracha</li><li><kbd>G</kbd> Balde</li><li><kbd>Shift</kbd> + balde: troca a cor na skin inteira</li>
+          <li><kbd>I</kbd> ou <kbd>Alt</kbd> + clique: conta-gotas</li><li><kbd>L</kbd> Clarear</li><li><kbd>K</kbd> Escurecer</li><li><kbd>N</kbd> Ruído</li>
+          <li><kbd>H</kbd> Girar</li><li><kbd>M</kbd> Simetria</li><li><kbd>1</kbd>–<kbd>9</kbd> Cores recentes</li><li><kbd>Ctrl</kbd> + <kbd>Z</kbd> Desfazer</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="band foot">
+  <p>As skins do acervo foram desenhadas para a Forja de Skins e estão em domínio público (CC0). Minecraft é marca da Mojang Studios; este site não é oficial nem afiliado.</p>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<div class="modal" id="saveModal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="saveTitle">
+    <h3 id="saveTitle">Salvar a imagem</h3>
+    <p>Este visualizador não permite download direto. Clique com o botão direito (ou toque e segure) na skin abaixo e escolha <i>Salvar imagem</i>. O arquivo tem 64 × 64 pixels.</p>
+    <img id="saveImg" alt="Skin para salvar" width="64" height="64">
+    <p class="mono" id="saveName"></p>
+    <button type="button" class="btn" id="saveClose">Fechar</button>
+  </div>
+</div>
+<!-- conteudo:fim -->
+<script src="https://cdn.jsdelivr.net/npm/skinview3d@3.4.1/bundles/skinview3d.bundle.js"></script>
+<script src="js/skins.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
